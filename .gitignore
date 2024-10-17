@@ -17,3 +17,8 @@
 .nfs*
 
 # End of https://www.toptal.com/developers/gitignore/api/linux
+
+# fio
+output/
+rand-4k-q32tN.fio
+randrw-4k-q32tN.fio
