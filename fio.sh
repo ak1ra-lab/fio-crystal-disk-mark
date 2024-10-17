@@ -106,7 +106,7 @@ loop_fio_jobs() {
     for job in "${fio_jobs[@]}"; do
         if [ "${job##*.}" = "j2" ]; then
             job="${job%.j2}"
-            sed -e 's%{{ nproc }}%'"$(nproc)"'%g' "${job}.j2" >"${job}"
+            sed -e 's%{{ nproc }}%'"$(nproc)"'%g' "${jobs_dir}/${job}.j2" >"${jobs_dir}/${job}"
         fi
         output="${output_dir}/${testfile##*/}-${job%.fio}-$(date +%F.%s).txt"
         if [ "${dry_run}" = "true" ]; then
