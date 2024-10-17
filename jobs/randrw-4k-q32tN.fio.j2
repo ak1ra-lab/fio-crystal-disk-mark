@@ -1,0 +1,12 @@
+[global]
+ioengine=libaio
+
+# ===== Random, 4KiB, Q32T{{ nproc }} =====
+[randrw-4k-q32t{{ nproc }}]
+description=Random mixed reads and writes
+bs=4k
+iodepth=32
+numjobs={{ nproc }}
+readwrite=randrw
+rwmixread=50
+stonewall

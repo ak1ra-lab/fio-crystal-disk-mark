@@ -1,0 +1,18 @@
+[global]
+ioengine=libaio
+
+[randread-4k-q1t1]
+description=Random reads
+bs=4k
+iodepth=1
+numjobs=1
+readwrite=randread
+stonewall
+
+[randwrite-4k-q1t1]
+description=Random writes
+bs=4k
+iodepth=1
+numjobs=1
+readwrite=randwrite
+stonewall

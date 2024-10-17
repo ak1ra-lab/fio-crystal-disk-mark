@@ -1,0 +1,20 @@
+[global]
+ioengine=libaio
+
+# ===== Sequential, 1MiB, Q8T1 =====
+[read-1m-q8t1]
+description=Sequential reads
+bs=1m
+iodepth=8
+numjobs=1
+readwrite=read
+stonewall
+
+# ===== Sequential, 1MiB, Q8T1 =====
+[write-1m-q8t1]
+description=Sequential writes
+bs=1m
+iodepth=8
+numjobs=1
+readwrite=write
+stonewall
