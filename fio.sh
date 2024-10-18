@@ -100,7 +100,6 @@ set_fio_jobs() {
 loop_fio_jobs() {
     testfile="$1"
     jobs_dir="${this%/*}/jobs"
-    output_dir="$(dirname "${this}")/output/${testfile##*/}"
 
     # Note that the Bash =~ operator only does regular expression matching when the right hand side is UNQUOTED
     # the string to the right of the operator is considered a POSIX extended regular expression
@@ -116,7 +115,9 @@ loop_fio_jobs() {
             job="${job%.j2}"
             sed -e 's%{{ nproc }}%'"$(nproc)"'%g' "${jobs_dir}/${job}.j2" >"${jobs_dir}/${job}"
         fi
-        output="${output_dir}/${testfile##*/}-${job%.fio}-$(date +%F.%s).txt"
+
+        output_dir="$(dirname "${this}")/output/${testfile##*/}"
+        output="${output_dir}/${testfile##*/}-${job%.fio}-$(date +%F).txt"
         if [ "${dry_run}" = "true" ]; then
             echo \
                 fio "${jobs_dir}/${job}" --output="${output}" "${fio_args[@]}"
