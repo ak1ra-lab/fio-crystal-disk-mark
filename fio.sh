@@ -6,7 +6,10 @@ set -o errexit -o nounset -o pipefail
 
 this="$(readlink -f "${0}")"
 
+declare size="5g"
+declare runtime=300
 declare dry_run="false"
+
 declare -a fio_args fio_jobs
 
 require_command() {
@@ -31,8 +34,12 @@ Usage:
         otherwise, you need to set testfile as a regular file locate on the disk to be test.
     -p, --profile
         profile must be one of [all|seq|rand|readwrite|randrw]
+    -s, --size
+        testfile size when test in regular file mode
+    -r, --runtime
+        time_based runtime when test in direct mode
     -D, --dry-run
-        dry_run mode, only print fio command with args
+        dry_run mode, only print fio command to be execute with args
 
 Examples:
     # fio in --direct mode
@@ -94,12 +101,11 @@ loop_fio_jobs() {
     testfile="$1"
     jobs_dir="${this%/*}/jobs"
     output_dir="$(dirname "${this}")/output/${testfile##*/}"
-    test -d "${output_dir}" || mkdir -p "${output_dir}"
 
     if [ -b "${testfile}" ]; then
-        fio_args=("--filename=${testfile}" "--direct=1" "--time_based" "--runtime=300")
+        fio_args=("--filename=${testfile}" "--direct=1" "--time_based" "--runtime=${runtime}")
     else
-        fio_args=("--filename=${testfile}" "--size=5g")
+        fio_args=("--filename=${testfile}" "--size=${size}")
     fi
 
     # job without pathname
@@ -113,6 +119,7 @@ loop_fio_jobs() {
             echo \
                 fio "${jobs_dir}/${job}" --output="${output}" "${fio_args[@]}"
         else
+            test -d "${output_dir}" || mkdir -p "${output_dir}"
             (
                 set -x
                 fio "${jobs_dir}/${job}" --output="${output}" "${fio_args[@]}"
@@ -129,8 +136,8 @@ main() {
     declare profile="seq"
 
     getopt_args="$(
-        getopt -o 'hDt:p:' \
-            -l 'help,dry-run,testfile:,profile:' -- "$@"
+        getopt -o 'hDt:p:s:r:' \
+            -l 'help,dry-run,testfile:,profile:size:runtime:' -- "$@"
     )"
     if ! eval set -- "${getopt_args}"; then
         usage
@@ -151,6 +158,14 @@ main() {
             ;;
         -p | --profile)
             profile="$2"
+            shift 2
+            ;;
+        -s | --size)
+            size="$2"
+            shift 2
+            ;;
+        -r | --runtime)
+            runtime="$2"
             shift 2
             ;;
         --)
