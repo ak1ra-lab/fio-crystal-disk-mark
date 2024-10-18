@@ -13,8 +13,12 @@ Usage:
         otherwise, you need to set testfile as a regular file locate on the disk to be test.
     -p, --profile
         profile must be one of [all|seq|rand|readwrite|randrw]
+    -s, --size
+        testfile size when test in regular file mode
+    -r, --runtime
+        time_based runtime when test in direct mode
     -D, --dry-run
-        dry_run mode, only print fio command with args
+        dry_run mode, only print fio command to be execute with args
 
 Examples:
     # fio in --direct mode

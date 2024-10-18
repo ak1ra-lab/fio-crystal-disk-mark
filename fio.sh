@@ -102,7 +102,9 @@ loop_fio_jobs() {
     jobs_dir="${this%/*}/jobs"
     output_dir="$(dirname "${this}")/output/${testfile##*/}"
 
-    if [ -b "${testfile}" ]; then
+    # Note that the Bash =~ operator only does regular expression matching when the right hand side is UNQUOTED
+    # the string to the right of the operator is considered a POSIX extended regular expression
+    if [[ -b "${testfile}" ]] || [[ "${testfile}" =~ ^/dev ]]; then
         fio_args=("--filename=${testfile}" "--direct=1" "--time_based" "--runtime=${runtime}")
     else
         fio_args=("--filename=${testfile}" "--size=${size}")
@@ -137,7 +139,7 @@ main() {
 
     getopt_args="$(
         getopt -o 'hDt:p:s:r:' \
-            -l 'help,dry-run,testfile:,profile:size:runtime:' -- "$@"
+            -l 'help,dry-run,testfile:,profile:,size:,runtime:' -- "$@"
     )"
     if ! eval set -- "${getopt_args}"; then
         usage
