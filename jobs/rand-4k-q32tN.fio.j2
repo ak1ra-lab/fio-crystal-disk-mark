@@ -1,18 +1,18 @@
 [global]
 ioengine=libaio
 
-[randread-4k-q32t{{ nproc }}]
-description=Random reads
-bs=4k
-iodepth=32
-numjobs={{ nproc }}
-readwrite=randread
-stonewall
-
 [randwrite-4k-q32t{{ nproc }}]
 description=Random writes
 bs=4k
 iodepth=32
 numjobs={{ nproc }}
 readwrite=randwrite
+stonewall
+
+[randread-4k-q32t{{ nproc }}]
+description=Random reads
+bs=4k
+iodepth=32
+numjobs={{ nproc }}
+readwrite=randread
 stonewall

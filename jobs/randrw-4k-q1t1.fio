@@ -1,7 +1,6 @@
 [global]
 ioengine=libaio
 
-# ===== Random, 4KiB, Q1T1 =====
 [randrw-4k-q1t1]
 description=Random mixed reads and writes
 bs=4k

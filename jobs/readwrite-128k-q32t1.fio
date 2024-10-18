@@ -1,7 +1,6 @@
 [global]
 ioengine=libaio
 
-# ===== Sequential, 128KiB, Q32T1 =====
 [readwrite-128k-q32t1]
 description=Sequential mixed reads and writes
 bs=128k

@@ -2,19 +2,18 @@
 ioengine=libaio
 
 # ===== Sequential, 128KiB, Q32T1 =====
-[read-128k-q32t1]
-description=Sequential reads
-bs=128k
-iodepth=32
-numjobs=1
-readwrite=read
-stonewall
-
-# ===== Sequential, 128KiB, Q32T1 =====
 [write-128k-q32t1]
 description=Sequential writes
 bs=128k
 iodepth=32
 numjobs=1
 readwrite=write
+stonewall
+
+[read-128k-q32t1]
+description=Sequential reads
+bs=128k
+iodepth=32
+numjobs=1
+readwrite=read
 stonewall
