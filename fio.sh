@@ -104,6 +104,8 @@ loop_fio_jobs() {
     # Note that the Bash =~ operator only does regular expression matching when the right hand side is UNQUOTED
     # the string to the right of the operator is considered a POSIX extended regular expression
     if [[ -b "${testfile}" ]] || [[ "${testfile}" =~ ^/dev ]]; then
+        # save S.M.A.R.T info on block device before test
+        smartctl -a "${testfile}" >"${output_dir}/${testfile##*/}-smartctl-$(date +%F.%s).txt"
         fio_args=("--filename=${testfile}" "--direct=1" "--time_based" "--runtime=${runtime}")
     else
         fio_args=("--filename=${testfile}" "--size=${size}")
@@ -132,7 +134,7 @@ loop_fio_jobs() {
 }
 
 main() {
-    require_command jq fio
+    require_command fio jq smartctl
 
     # default options
     declare testfile=""
