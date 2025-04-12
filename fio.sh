@@ -4,7 +4,8 @@
 
 set -o errexit -o nounset -o pipefail
 
-this="$(readlink -f "${0}")"
+self="$(readlink -f "$0")"
+self_dir="$(dirname "${self}")"
 
 declare size="5g"
 declare runtime=300
@@ -22,7 +23,7 @@ require_command() {
 }
 
 usage() {
-    prog="${this##*/}"
+    prog="${self##*/}"
     cat <<EOF
 Usage:
     ${prog} [-D|--dry-run] [--profile profile] --testfile <testfile>
@@ -99,13 +100,17 @@ set_fio_jobs() {
 
 loop_fio_jobs() {
     testfile="$1"
-    jobs_dir="${this%/*}/jobs"
+    jobs_dir="${self%/*}/jobs"
+
+    timestamp="$(date +%F-%H%M%S)"
+    output_dir="${self_dir}/output/${testfile##*/}"
+    test -d "${output_dir}" || mkdir -p "${output_dir}"
 
     # Note that the Bash =~ operator only does regular expression matching when the right hand side is UNQUOTED
     # the string to the right of the operator is considered a POSIX extended regular expression
     if [[ -b "${testfile}" ]] || [[ "${testfile}" =~ ^/dev ]]; then
         # save S.M.A.R.T info on block device before test
-        smartctl -a "${testfile}" >"${output_dir}/${testfile##*/}-smartctl-$(date +%F.%s).txt"
+        smartctl -a "${testfile}" >"${output_dir}/${testfile##*/}-smartctl-${timestamp}.txt"
         fio_args=("--filename=${testfile}" "--direct=1" "--time_based" "--runtime=${runtime}")
     else
         fio_args=("--filename=${testfile}" "--size=${size}")
@@ -113,18 +118,16 @@ loop_fio_jobs() {
 
     # job without pathname
     for job in "${fio_jobs[@]}"; do
-        if [ "${job##*.}" = "j2" ]; then
+        if [[ "${job##*.}" == "j2" ]]; then
             job="${job%.j2}"
             sed -e 's%{{ nproc }}%'"$(nproc)"'%g' "${jobs_dir}/${job}.j2" >"${jobs_dir}/${job}"
         fi
 
-        output_dir="$(dirname "${this}")/output/${testfile##*/}"
-        output="${output_dir}/${testfile##*/}-${job%.fio}-$(date +%F).txt"
-        if [ "${dry_run}" = "true" ]; then
+        output="${output_dir}/${testfile##*/}-${job%.fio}-${timestamp}.txt"
+        if [[ "${dry_run}" == "true" ]]; then
             echo \
                 fio "${jobs_dir}/${job}" --output="${output}" "${fio_args[@]}"
         else
-            test -d "${output_dir}" || mkdir -p "${output_dir}"
             (
                 set -x
                 fio "${jobs_dir}/${job}" --output="${output}" "${fio_args[@]}"
